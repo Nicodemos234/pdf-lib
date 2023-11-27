@@ -858,9 +858,9 @@ const transform = (
     case 'rotate': {
       if (args.length > 1) {
         const [a, x, y = x] = args;
-        let tempResult = transform(converter, 'translate', [x, y]);
+        let tempResult = transform(converter, 'translate', [x, -y]);
         tempResult = transform(tempResult, 'rotate', [a]);
-        return transform(tempResult, 'translate', [-x, -y]);
+        return transform(tempResult, 'translate', [-x, y]);
       } else {
         const [a] = args;
         const angle = degreesToRadians(a);
@@ -1423,6 +1423,10 @@ const parseAttributes = (
     const inner = newInherited.fontFamily.match(/^"(.*?)"|^'(.*?)'/);
     if (inner) newInherited.fontFamily = inner[1] || inner[2];
   }
+  
+  // In case we don't have a rotate, that applies inherited rotation to it, we use the inherited rotation
+  if (!svgAttributes.rotate && newInherited.rotation)
+    svgAttributes.rotate = newInherited.rotation;
 
   if (newInherited.strokeWidth) {
     const result = newConverter.size(
